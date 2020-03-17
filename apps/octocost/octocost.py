@@ -9,10 +9,10 @@ class OctoCost(hass.Hass):
         self.auth = self.args['auth']
         MPAN = self.args['mpan']
         SERIAL = self.args['serial']
-		region = self.args['region']
+        region = self.args['region']
         self.startdate = datetime.date.fromisoformat(str(self.args['startdate']))
         self.consumptionurl = 'https://api.octopus.energy/v1/electricity-meter-points/' + str(MPAN) + '/meters/' + str(SERIAL) + '/consumption/'
-        self.costurl= 'https://api.octopus.energy/v1/products/AGILE-18-02-21/electricity-tariffs/E-1R-AGILE-18-02-21-' + str(region) + '/standard-unit-rates/'
+        self.costurl= 'https://api.octopus.energy/v1/products/AGILE-18-02-21/electricity-tariffs/E-1R-AGILE-18-02-21-' + str(region).upper() + '/standard-unit-rates/'
         time = datetime.datetime.now()
         time = time + datetime.timedelta(seconds=5)
         self.run_every(self.cost_and_usage_callback, time, 120 * 60)
