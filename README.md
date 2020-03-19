@@ -12,7 +12,6 @@ The data is updated once every two hours, although in reality the data Octopus E
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 
 ### Installation
-
 Use [HACS](https://github.com/custom-components/hacs) or download the octoblock directory from inside the apps directory [here](https://github.com/badguy99/octocost/releases) to your local apps directory, then add the configuration to enable the octocost module.
 
 
@@ -28,7 +27,6 @@ octocost:
   startdate: 2020-02-23
 
 ``` 
-
 The module and class sections need to remain as above, other sections should be changed as required.
 
 | Field     | Changeable | Example         |
@@ -42,5 +40,27 @@ The module and class sections need to remain as above, other sections should be 
 | auth      | Yes        | sk_live_abcdefg |
 | startdate | Yes        | 2020-02-23      |
 
-The `startdate` setting should be set to the date you started on the Agile Octopus tariff, not the date you joined Octopus Energy. It is used to adjust the start point if you joined within the current year or month, but should not be left blank if you joined earlier.
-`region` is the region letter from the end of `E-1R-AGILE-18-02-21-H` which can be found on the `https://octopus.energy/dashboard/developer/` webpage in the Unit Rates section for your account.
+The `startdate` setting should be set to the date you started on the Agile Octopus tariff, not the date you joined Octopus Energy. It is used to adjust the start point if you joined within the current year or month, it should not be left blank if you joined earlier.
+`region` is the region letter from the end of `E-1R-AGILE-18-02-21-H` which can be found on the [Octopus Energy developer dashboard](https://octopus.energy/dashboard/developer/) webpage in the Unit Rates section for your account.
+
+### Lovelace UI Cards
+Once the sensors are created, they can be displayed as cards within the Lovelace UI. For example:
+```
+      - entities:
+          - entity: sensor.octopus_yearly_usage
+            icon: 'mdi:flash'
+            name: Yearly Usage (kWh)
+          - entity: sensor.octopus_yearly_cost
+            icon: 'mdi:cash'
+            name: Yearly Cost (£)
+          - entity: sensor.octopus_monthly_usage
+            icon: 'mdi:flash'
+            name: Monthly Usage (kWh)
+          - entity: sensor.octopus_monthly_cost
+            icon: 'mdi:cash'
+            name: Monthly Cost (£)
+        show_icon: true
+        title: Octopus Usage / Cost
+        type: glance
+```
+![image Example Lovelace UI Usage and Cost glance card](https://github.com/badguy99/octocost/blob/master/LovelaceUsageCard.PNG)
