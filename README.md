@@ -9,7 +9,7 @@ sensor.octopus_monthly_usage
 ```
 The data is updated once every two hours, although in reality the data Octopus Energy gets only seems to be updated once a day, so this is a compromise between trying to be up-to-date, and not hammering their servers, when the data doesn't update very frequently anyway.
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
 
 ### Installation
 Use [HACS](https://github.com/custom-components/hacs) or download the octoblock directory from inside the apps directory [here](https://github.com/badguy99/octocost/releases) to your local apps directory, then add the configuration to enable the octocost module.
@@ -63,4 +63,4 @@ Once the sensors are created, they can be displayed as cards within the Lovelace
         title: Octopus Usage / Cost
         type: glance
 ```
-![image Example Lovelace UI Usage and Cost glance card](https://github.com/badguy99/octocost/blob/master/LovelaceUsageCard.PNG)
+![Example Lovelace UI Usage and Cost glance card](https://github.com/badguy99/octocost/blob/master/LovelaceUsageCard.PNG)
