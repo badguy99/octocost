@@ -2,6 +2,8 @@ import appdaemon.plugins.hass.hassapi as hass
 import datetime
 import requests
 import json
+import dateutil.parser
+import pytz
 
 
 class OctoCost(hass.Hass):
@@ -89,6 +91,7 @@ class OctoCost(hass.Hass):
         usage = 0
         price = 0
         cost = []
+        utc = pytz.timezone('UTC')
 
         results = jconsumption[u'results']
 
@@ -105,9 +108,22 @@ class OctoCost(hass.Hass):
             usage = usage + (results[curridx][u'consumption'])
             if ((results[curridx][u'interval_start']) !=
                (cost[curridx][u'valid_from'])):
-                print('Unmatched consumption {}'.format(
-                    results[curridx][u'interval_start']) +
-                    ' / cost {}'.format(cost[curridx][u'valid_from']))
+                # Daylight Savings?
+                consumption_date = (results[curridx][u'interval_start'])
+                if consumption_date.endswith('+01:00'):
+                    date_time = dateutil.parser.parse(consumption_date)
+                    utc_datetime = date_time.astimezone(utc)
+                    utc_iso = utc_datetime.isoformat().replace("+00:00", "Z")
+                    if utc_iso == (cost[curridx][u'valid_from']):
+                        (results[curridx][u'interval_start']) = utc_iso
+                    else:
+                        print('UTC Unmatched consumption {}'.format(
+                            results[curridx][u'interval_start']) +
+                            ' / cost {}'.format(cost[curridx][u'valid_from']))
+                else:
+                    print('Unmatched consumption {}'.format(
+                        results[curridx][u'interval_start']) +
+                        ' / cost {}'.format(cost[curridx][u'valid_from']))
             price = price + ((cost[curridx][u'value_inc_vat']) *
                              (results[curridx][u'consumption']))
         return usage, price
