@@ -26,7 +26,7 @@ class OctoCost(hass.Hass):
 
     def cost_and_usage_callback(self, kwargs):
         today = datetime.date.today()
-        self.yesterday = datetime.date(today.year, today.month, today.day-1)
+        self.yesterday = today - datetime.timedelta(days=1)
         startyear = datetime.date(today.year, 1, 1)
         startmonth = datetime.date(today.year, today.month, 1)
 
