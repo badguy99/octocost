@@ -86,8 +86,6 @@ class OctoCost(hass.Hass):
         jconsumption = json.loads(rconsumption.text)
         jcost = json.loads(rcost.text)
 
-        jconsumption[u'count']
-
         usage = 0
         price = 0
         cost = []
