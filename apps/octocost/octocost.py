@@ -41,20 +41,20 @@ class OctoCost(hass.Hass):
         self.run_in(self.cost_and_usage_callback, 5,
                     use=consumptionurl, cost=costurl, date=elecstartdate)
         if gas:
-            self.run_in(self.cost_and_usage_callback, 5,
+            self.run_in(self.cost_and_usage_callback, 65,
                         use=gasconsumptionurl, cost=gascosturl,
                         date=gasstartdate, gas=True)
 
         for hour in [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]:
-            self.run_hourly(self.cost_and_usage_callback,
-                            datetime.time(hour, 0, 0),
+            self.run_daily(self.cost_and_usage_callback,
+                            datetime.time(hour, 5, 0),
                             use=consumptionurl,
                             cost=costurl,
                             date=elecstartdate)
 
             if gas:
-                self.run_hourly(self.cost_and_usage_callback,
-                                datetime.time(hour, 0, 0),
+                self.run_daily(self.cost_and_usage_callback,
+                                datetime.time(hour, 7, 0),
                                 use=gasconsumptionurl,
                                 cost=gascosturl,
                                 date=gasstartdate,
