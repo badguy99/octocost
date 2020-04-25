@@ -11,7 +11,7 @@ class OctoCost(hass.Hass):
         self.auth = self.args['auth']
         MPAN = self.args['mpan']
         SERIAL = self.args['serial']
-        region = self.args.get('region', find_region(MPAN))
+        region = self.args.get('region', self.find_region(MPAN))
 
         self.startdate = datetime.date.fromisoformat(
             str(self.args['startdate']))
@@ -23,11 +23,11 @@ class OctoCost(hass.Hass):
             'AGILE-18-02-21/electricity-tariffs/E-1R-AGILE-18-02-21-' + \
             str(region).upper() + '/standard-unit-rates/'
 
-        self.run_in(self.period_and_cost_callback, 5,
+        self.run_in(self.cost_and_usage_callback, 5,
                     use=consumptionurl, cost=costurl)
 
         for hour in [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]:
-            self.run_hourly(self.period_and_cost_callback,
+            self.run_hourly(self.cost_and_usage_callback,
                             datetime.time(hour, 0, 0),
                             use=consumptionurl,
                             cost=costurl)
@@ -40,7 +40,7 @@ class OctoCost(hass.Hass):
         region = str(json_meter_details['gsp'][-1])
         return region
 
-    def cost_and_usage_callback(self, **kwargs):
+    def cost_and_usage_callback(self, kwargs):
         self.useurl = kwargs.get('use')
         self.costurl = kwargs.get('cost')
         today = datetime.date.today()
