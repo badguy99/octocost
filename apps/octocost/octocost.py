@@ -12,8 +12,15 @@ class OctoCost(hass.Hass):
         MPAN = self.args['mpan']
         SERIAL = self.args['serial']
         region = self.args.get('region', self.find_region(MPAN))
+        gas = self.args.get('gas', None)
+        if gas:
+            gas_tariff = gas.get('gas_tariff', None)
+            MPRN = gas.get('mprn', None)
+            GASSERIAL = gas.get('gasserial', None)
+            gasstartdate = datetime.date.fromisoformat(
+                str(gas.get('gas_startdate')))
 
-        self.startdate = datetime.date.fromisoformat(
+        elecstartdate = datetime.date.fromisoformat(
             str(self.args['startdate']))
 
         consumptionurl = 'https://api.octopus.energy/' + \
@@ -23,14 +30,35 @@ class OctoCost(hass.Hass):
             'AGILE-18-02-21/electricity-tariffs/E-1R-AGILE-18-02-21-' + \
             str(region).upper() + '/standard-unit-rates/'
 
+        if gas:
+            gasconsumptionurl = 'https://api.octopus.energy/' + \
+                'v1/gas-meter-points/' + str(MPRN) + '/meters/' + \
+                str(GASSERIAL) + '/consumption/'
+            gascosturl = 'https://api.octopus.energy/v1/products/' + \
+                gas_tariff + '/gas-tariffs/G-1R-' + gas_tariff + '-' + \
+                str(region).upper() + '/standard-unit-rates/'
+
         self.run_in(self.cost_and_usage_callback, 5,
-                    use=consumptionurl, cost=costurl)
+                    use=consumptionurl, cost=costurl, date=elecstartdate)
+        if gas:
+            self.run_in(self.cost_and_usage_callback, 5,
+                        use=gasconsumptionurl, cost=gascosturl,
+                        date=gasstartdate, gas=True)
 
         for hour in [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]:
             self.run_hourly(self.cost_and_usage_callback,
                             datetime.time(hour, 0, 0),
                             use=consumptionurl,
-                            cost=costurl)
+                            cost=costurl,
+                            date=elecstartdate)
+
+            if gas:
+                self.run_hourly(self.cost_and_usage_callback,
+                                datetime.time(hour, 0, 0),
+                                use=gasconsumptionurl,
+                                cost=gascosturl,
+                                date=gasstartdate,
+                                gas=True)
 
     def find_region(mpan):
         url = 'https://api.octopus.energy/v1/electricity-meter-points/' + \
@@ -43,6 +71,8 @@ class OctoCost(hass.Hass):
     def cost_and_usage_callback(self, kwargs):
         self.useurl = kwargs.get('use')
         self.costurl = kwargs.get('cost')
+        self.startdate = kwargs.get('date')
+        self.gas = kwargs.get('gas', False)
         today = datetime.date.today()
         self.yesterday = today - datetime.timedelta(days=1)
         startyear = datetime.date(today.year, 1, 1)
@@ -56,30 +86,48 @@ class OctoCost(hass.Hass):
 
         monthlyusage, monthlycost = self.calculate_cost_and_usage(
             start=startmonth)
-        print('Total monthly usage: {} kWh'.format(monthlyusage))
+        print('Total monthly usage: {}'.format(monthlyusage))
         print('Total monthly cost: {} p'.format(monthlycost))
 
         yearlyusage, yearlycost = self.calculate_cost_and_usage(
             start=startyear)
-        print('Total yearly usage: {} kWh'.format(yearlyusage))
+        print('Total yearly usage: {}'.format(yearlyusage))
         print('Total yearly cost: {} p'.format(yearlycost))
 
-        self.set_state('sensor.octopus_yearly_usage',
-                       state=round(yearlyusage, 2),
-                       attributes={'unit_of_measurement': 'kWh',
-                                   'icon': 'mdi:flash'})
-        self.set_state('sensor.octopus_yearly_cost',
-                       state=round(yearlycost/100, 2),
-                       attributes={'unit_of_measurement': '£',
-                                   'icon': 'mdi:cash'})
-        self.set_state('sensor.octopus_monthly_usage',
-                       state=round(monthlyusage, 2),
-                       attributes={'unit_of_measurement': 'kWh',
-                                   'icon': 'mdi:flash'})
-        self.set_state('sensor.octopus_monthly_cost',
-                       state=round(monthlycost/100, 2),
-                       attributes={'unit_of_measurement': '£',
-                                   'icon': 'mdi:cash'})
+        if not self.gas:
+            self.set_state('sensor.octopus_yearly_usage',
+                           state=round(yearlyusage, 2),
+                           attributes={'unit_of_measurement': 'kWh',
+                                       'icon': 'mdi:flash'})
+            self.set_state('sensor.octopus_yearly_cost',
+                           state=round(yearlycost/100, 2),
+                           attributes={'unit_of_measurement': '£',
+                                       'icon': 'mdi:cash'})
+            self.set_state('sensor.octopus_monthly_usage',
+                           state=round(monthlyusage, 2),
+                           attributes={'unit_of_measurement': 'kWh',
+                                       'icon': 'mdi:flash'})
+            self.set_state('sensor.octopus_monthly_cost',
+                           state=round(monthlycost/100, 2),
+                           attributes={'unit_of_measurement': '£',
+                                       'icon': 'mdi:cash'})
+        else:
+            self.set_state('sensor.octopus_yearly_gas_usage',
+                           state=round(yearlyusage, 2),
+                           attributes={'unit_of_measurement': 'm3',
+                                       'icon': 'mdi:fire'})
+            self.set_state('sensor.octopus_yearly_gas_cost',
+                           state=round(yearlycost/100, 2),
+                           attributes={'unit_of_measurement': '£',
+                                       'icon': 'mdi:cash'})
+            self.set_state('sensor.octopus_monthly_gas_usage',
+                           state=round(monthlyusage, 2),
+                           attributes={'unit_of_measurement': 'm3',
+                                       'icon': 'mdi:fire'})
+            self.set_state('sensor.octopus_monthly_gas_cost',
+                           state=round(monthlycost/100, 2),
+                           attributes={'unit_of_measurement': '£',
+                                       'icon': 'mdi:cash'})
 
     def calculate_count(self, start):
         numberdays = self.yesterday-start
@@ -122,24 +170,34 @@ class OctoCost(hass.Hass):
         for period in results:
             curridx = results.index(period)
             usage = usage + (results[curridx][u'consumption'])
-            if ((results[curridx][u'interval_start']) !=
-               (cost[curridx][u'valid_from'])):
-                # Daylight Savings?
-                consumption_date = (results[curridx][u'interval_start'])
-                if consumption_date.endswith('+01:00'):
-                    date_time = dateutil.parser.parse(consumption_date)
-                    utc_datetime = date_time.astimezone(utc)
-                    utc_iso = utc_datetime.isoformat().replace("+00:00", "Z")
-                    if utc_iso == (cost[curridx][u'valid_from']):
-                        (results[curridx][u'interval_start']) = utc_iso
+            if not self.gas:
+                if ((results[curridx][u'interval_start']) !=
+                   (cost[curridx][u'valid_from'])):
+                    # Daylight Savings?
+                    consumption_date = (results[curridx][u'interval_start'])
+                    if consumption_date.endswith('+01:00'):
+                        date_time = dateutil.parser.parse(consumption_date)
+                        utc_datetime = date_time.astimezone(utc)
+                        utc_iso = utc_datetime.isoformat().replace("+00:00", "Z")
+                        if utc_iso == (cost[curridx][u'valid_from']):
+                            (results[curridx][u'interval_start']) = utc_iso
+                        else:
+                            print('UTC Unmatched consumption {}'.format(
+                                results[curridx][u'interval_start']) +
+                                ' / cost {}'.format(cost[curridx][u'valid_from']))
                     else:
-                        print('UTC Unmatched consumption {}'.format(
+                        print('Unmatched consumption {}'.format(
                             results[curridx][u'interval_start']) +
                             ' / cost {}'.format(cost[curridx][u'valid_from']))
+                price = price + ((cost[curridx][u'value_inc_vat']) *
+                                 (results[curridx][u'consumption']))
+            else:
+                # Only dealing with gas price which doesn't vary at the moment
+                if jcost['count'] == 1:
+                    cost = jcost['results'][0][u'value_inc_vat']
+                    price = price + cost * (results[curridx][u'consumption'])
                 else:
-                    print('Unmatched consumption {}'.format(
-                        results[curridx][u'interval_start']) +
-                        ' / cost {}'.format(cost[curridx][u'valid_from']))
-            price = price + ((cost[curridx][u'value_inc_vat']) *
-                             (results[curridx][u'consumption']))
+                    print('Error: can only process fixed price gas')
+                    price = 0
+
         return usage, price
