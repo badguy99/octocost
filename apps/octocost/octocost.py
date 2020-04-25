@@ -15,16 +15,22 @@ class OctoCost(hass.Hass):
 
         self.startdate = datetime.date.fromisoformat(
             str(self.args['startdate']))
-        self.consumptionurl = 'https://api.octopus.energy/' + \
+
+        consumptionurl = 'https://api.octopus.energy/' + \
             'v1/electricity-meter-points/' + str(MPAN) + '/meters/' + \
             str(SERIAL) + '/consumption/'
-        self.costurl = 'https://api.octopus.energy/v1/products/' + \
+        costurl = 'https://api.octopus.energy/v1/products/' + \
             'AGILE-18-02-21/electricity-tariffs/E-1R-AGILE-18-02-21-' + \
             str(region).upper() + '/standard-unit-rates/'
-        time = datetime.datetime.now()
-        time = time + datetime.timedelta(seconds=5)
-        self.run_every(self.cost_and_usage_callback, time, 120 * 60)
 
+        self.run_in(self.period_and_cost_callback, 5,
+                    use=consumptionurl, cost=costurl)
+
+        for hour in [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22]:
+            self.run_hourly(self.period_and_cost_callback,
+                            datetime.time(hour, 0, 0),
+                            use=consumptionurl,
+                            cost=costurl)
 
     def find_region(mpan):
         url = 'https://api.octopus.energy/v1/electricity-meter-points/' + \
@@ -34,7 +40,9 @@ class OctoCost(hass.Hass):
         region = str(json_meter_details['gsp'][-1])
         return region
 
-    def cost_and_usage_callback(self, kwargs):
+    def cost_and_usage_callback(self, **kwargs):
+        self.useurl = kwargs.get('use')
+        self.costurl = kwargs.get('cost')
         today = datetime.date.today()
         self.yesterday = today - datetime.timedelta(days=1)
         startyear = datetime.date(today.year, 1, 1)
@@ -80,7 +88,7 @@ class OctoCost(hass.Hass):
 
     def calculate_cost_and_usage(self, start):
         self.calculate_count(start=start)
-        rconsumption = requests.get(url=self.consumptionurl +
+        rconsumption = requests.get(url=self.useurl +
                                     '?order_by=period&period_from=' +
                                     start.isoformat() +
                                     'T00:00:00Z&period_to=' +
