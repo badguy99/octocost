@@ -11,7 +11,8 @@ class OctoCost(hass.Hass):
         self.auth = self.args['auth']
         MPAN = self.args['mpan']
         SERIAL = self.args['serial']
-        region = self.args['region']
+        region = self.args.get('region', find_region(MPAN))
+
         self.startdate = datetime.date.fromisoformat(
             str(self.args['startdate']))
         self.consumptionurl = 'https://api.octopus.energy/' + \
@@ -23,6 +24,15 @@ class OctoCost(hass.Hass):
         time = datetime.datetime.now()
         time = time + datetime.timedelta(seconds=5)
         self.run_every(self.cost_and_usage_callback, time, 120 * 60)
+
+
+    def find_region(mpan):
+        url = 'https://api.octopus.energy/v1/electricity-meter-points/' + \
+              str(mpan)
+        meter_details = requests.get(url)
+        json_meter_details = json.loads(meter_details.text)
+        region = str(json_meter_details['gsp'][-1])
+        return region
 
     def cost_and_usage_callback(self, kwargs):
         today = datetime.date.today()
