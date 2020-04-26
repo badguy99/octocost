@@ -56,6 +56,7 @@ The module and class sections need to remain as above, other sections should be 
 | gasserial     | Yes        | E1S12345678901   |
 | gas_tariff    | Yes        | FIX-12M-20-02-12 |
 | gas_startdate | Yes        | 2020-02-23       |
+
 The `startdate` setting should be set to the date you started on the Agile Octopus tariff, not the date you joined Octopus Energy. It is used to adjust the start point if you joined within the current year or month, it should not be left blank if you joined earlier.
 `region` is the region letter from the end of `E-1R-AGILE-18-02-21-H` which can be found on the [Octopus Energy developer dashboard](https://octopus.energy/dashboard/developer/) webpage in the Unit Rates section for your account.
 
