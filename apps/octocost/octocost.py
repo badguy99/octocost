@@ -150,11 +150,12 @@ class OctoCost(hass.Hass):
                              self.yesterday.isoformat() + 'T23:59:59Z')
 
         if rconsumption.status_code != 200:
-            self.log('Error getting consumption data: {}'.format(
-                     rconsumption.text), level='ERROR')
-        if rcost.status_code != 200:
-            self.log('Error getting cost data: {}'.format(rcost.text),
+            self.log('Error {} getting consumption data: {}'.format(
+                     rconsumption.status_code, rconsumption.text),
                      level='ERROR')
+        if rcost.status_code != 200:
+            self.log('Error {} getting cost data: {}'.format(
+                     rcost.status_code, rcost.text), level='ERROR')
 
         jconsumption = json.loads(rconsumption.text)
         jcost = json.loads(rcost.text)
