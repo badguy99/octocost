@@ -78,6 +78,14 @@ class OctoCost(hass.Hass):
         startyear = datetime.date(today.year, 1, 1)
         startmonth = datetime.date(today.year, today.month, 1)
 
+        if today == startmonth:
+            if today.month == 1:
+                startmonth = datetime.date(today.year-1, 12, 1)
+            else:
+                startmonth = datetime.date(today.year, today.month-1, 1)
+        if today == startyear:
+            startyear = datetime.date(today.year-1, 1, 1)
+
         if self.startdate > startmonth:
             startmonth = self.startdate
 
@@ -136,6 +144,10 @@ class OctoCost(hass.Hass):
 
     def calculate_cost_and_usage(self, start):
         self.calculate_count(start=start)
+        self.log('period_from: {}T00:00:00Z'.format(start.isoformat()),
+                 level='DEBUG')
+        self.log('period_to: {}T23:59:59Z'.format(self.yesterday.isoformat()),
+                 level='DEBUG')
         rconsumption = requests.get(url=self.useurl +
                                     '?order_by=period&period_from=' +
                                     start.isoformat() +
