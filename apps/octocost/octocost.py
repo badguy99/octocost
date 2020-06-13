@@ -60,7 +60,8 @@ class OctoCost(hass.Hass):
                                date=gasstartdate,
                                gas=True)
 
-    def find_region(self, mpan):
+    @classmethod
+    def find_region(cls, mpan):
         url = 'https://api.octopus.energy/v1/electricity-meter-points/' + \
               str(mpan)
         meter_details = requests.get(url)

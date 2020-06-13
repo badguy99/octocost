@@ -1,14 +1,16 @@
 # octocost
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
+
 Octocost is an app which works under [AppDaemon](https://www.home-assistant.io/docs/ecosystem/appdaemon/) within [Home Assistant](https://www.home-assistant.io/) which shows the yearly and month cost and usage of the Octopus Energy Agile Octopus Tariff
 It creates and sets sensors for yearly and monthly cost (£) and usage (kWh), up to yesterday:
-```
+```yaml
 sensor.octopus_yearly_cost
 sensor.octopus_yearly_usage
 sensor.octopus_monthly_cost
 sensor.octopus_monthly_usage
 ```
 If can also pull monthly and yearly gas cost and usage, and have sensors for them set up, if the gas section is included in the yaml configuration:
-```
+```yaml
 sensor.octopus_yearly_gas_cost
 sensor.octopus_yearly_gas_usage
 sensor.octopus_monthly_gas_cost
@@ -17,13 +19,10 @@ sensor.octopus_monthly_gas_usage
 
 The data is updated once every two hours, although in reality the data Octopus Energy gets only seems to be updated once a day, so this is a compromise between trying to be up-to-date, and not hammering their servers, when the data doesn't update very frequently anyway.
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
-
-### Installation
+## Installation
 Use [HACS](https://github.com/custom-components/hacs) or download the octoblock directory from inside the apps directory [here](https://github.com/badguy99/octocost/releases) to your local apps directory, then add the configuration to enable the octocost module.
 
-
-### Apps.yaml Configuration
+## Apps.yaml Configuration
 ```yaml
 octocost:
   module: octocost 
@@ -62,7 +61,7 @@ The `startdate` setting should be set to the date you started on the Agile Octop
 
 ### Lovelace UI Cards
 Once the sensors are created, they can be displayed as cards within the Lovelace UI. For example:
-```
+```yaml
       - entities:
           - entity: sensor.octopus_yearly_usage
             icon: 'mdi:flash'
