@@ -1,6 +1,8 @@
 # octocost
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
 
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/04ca04862e644daca2e4d0d2adb7e522)](https://www.codacy.com/manual/badguy99/octocost?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=badguy99/octocost&amp;utm_campaign=Badge_Grade)
+
 Octocost is an app which works under [AppDaemon](https://www.home-assistant.io/docs/ecosystem/appdaemon/) within [Home Assistant](https://www.home-assistant.io/) which shows the yearly and month cost and usage of the Octopus Energy Agile Octopus Tariff
 It creates and sets sensors for yearly and monthly cost (£) and usage (kWh), up to yesterday:
 ```yaml
