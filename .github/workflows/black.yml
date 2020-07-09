@@ -9,4 +9,4 @@ jobs:
     - name: Run Black
       uses: lgeiger/black-action@master
       with:
-        args: --check --diff .
+        args: .
