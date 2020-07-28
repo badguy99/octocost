@@ -3,6 +3,10 @@
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ddb8c55ca28342cbacc4f138bc7263a7)](https://www.codacy.com/manual/badguy99/octocost?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=badguy99/octocost&amp;utm_campaign=Badge_Grade)
 
+If you think this will be useful to you, please consider signing up to Octopus Energy with my referral code: https://share.octopus.energy/dense-ape-125 - You'll get £50 credit too!
+
+## Summary
+
 Octocost is an app which works under [AppDaemon](https://www.home-assistant.io/docs/ecosystem/appdaemon/) within [Home Assistant](https://www.home-assistant.io/) which shows the yearly and month cost and usage of the Octopus Energy Agile Octopus Tariff
 It creates and sets sensors for yearly and monthly cost (£) and usage (kWh), up to yesterday:
 ```yaml
