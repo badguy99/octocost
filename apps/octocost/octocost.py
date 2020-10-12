@@ -109,6 +109,7 @@ class OctoCost(hass.Hass):
         self.yesterday = today - datetime.timedelta(days=1)
         startyear = datetime.date(today.year, 1, 1)
         startmonth = datetime.date(today.year, today.month, 1)
+        startday = self.yesterday
 
         if today == startmonth:
             if today.month == 1:
@@ -123,6 +124,10 @@ class OctoCost(hass.Hass):
 
         if self.startdate > startyear:
             startyear = self.startdate
+
+        dayusage, daycost = self.calculate_cost_and_usage(start=startday)
+        self.log("Yesterday usage: {}".format(dayusage), level="INFO")
+        self.log("Yesterday cost: {} p".format(daycost), level="INFO")
 
         monthlyusage, monthlycost = self.calculate_cost_and_usage(start=startmonth)
         self.log("Total monthly usage: {}".format(monthlyusage), level="INFO")
@@ -151,6 +156,16 @@ class OctoCost(hass.Hass):
             self.set_state(
                 "sensor.octopus_monthly_cost",
                 state=round(monthlycost / 100, 2),
+                attributes={"unit_of_measurement": "£", "icon": "mdi:cash"},
+            )
+            self.set_state(
+                "sensor.octopus_day_usage",
+                state=round(dayusage, 2),
+                attributes={"unit_of_measurement": "kWh", "icon": "mdi:flash"},
+            )
+            self.set_state(
+                "sensor.octopus_day_cost",
+                state=round(daycost / 100, 2),
                 attributes={"unit_of_measurement": "£", "icon": "mdi:cash"},
             )
         else:
