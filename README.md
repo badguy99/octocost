@@ -3,6 +3,14 @@
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ddb8c55ca28342cbacc4f138bc7263a7)](https://www.codacy.com/manual/badguy99/octocost?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=badguy99/octocost&amp;utm_campaign=Badge_Grade)
 
+**Please note:** I am archiving this repository. I will no longer maintain it, but leave it here read only. Currently I will leave it in HACS default, so it can still be installed, however I reserve the right to remove it from HACS default (it will still be installable via HACS custom).
+There are a number of issues remaining with this, that I have not resolved:
+* It doesn't handle variable rate gas tariffs, or the tracker gas tariff which is not in the normal Octopus API.
+* It doesn't deal well with missing usage data, and will probably mismatch the cost - usage, getting the calculations wrong.
+
+However feel free to fork the repo and take it on
+
+
 If you think this will be useful to you, please consider signing up to Octopus Energy with my referral code: https://share.octopus.energy/dense-ape-125 - You'll get £50 credit too!
 
 ## Summary
